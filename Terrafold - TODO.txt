@@ -1,0 +1,143 @@
+
+
+the space station gives me way less ice/dirt then it actually says it does
+
+1/10/100/custom options for threads and robots
+
+
+Computer
+	Optimize Land - as is
+	Modify Buy Ice 
+		Every 1000 bought, ticks += 4, ice bought += 1
+		Initial changed to 40
+	Remove sell water
+	Have better late-game scaling for find more ice sellers
+		Every 1000 bought, cost/ticks *= 4, gain *= 5
+	Find more Water Buyers
+		Quadratically scaling science cost
+		Shortish tick time
+	Modify Bigger Storms
+		Disappears when complete
+		Unlocks Targetted Sunlight
+			Improves ice melting rate, 10% at a time up to 100%
+			Disappears when Complete
+			Unlocks Targetted Humidity
+				Grow ferns faster, 10% at a time up to 100%
+				Disappears when complete
+	Remove Build Robots
+	Remove More Robot Storage
+	Improve House Design Rework
+		Double happiness bonus, cost increase 10x, ticks increase 3x
+		Costs wood 
+	Improve Saws
+		Improve Cut Trees rate by 10%
+		Takes lots of ticks, tiny amount of metal
+
+Robots
+	Build Robots
+		requires 10 * # metal, 5k science * # of robots, linear tick increase
+	Cut Trees 
+		2 trees for 1 wood 
+	Remove Modify Expand indoor water storage
+	More Robot Storage - 
+		Costs 250 land, Metal
+		Stores 1 robot
+	Modify Build Mines
+		faster tick cost increase
+		lower limit - floor(square(land)/10)
+		Show how many there are
+	Remove Turn Ore into Dirt
+	Stuff Ore Into Compactor
+		Expensive on ticks, no cost otherwise
+		Puts 1% of ore into compacted storage
+	Has Compacted Ore
+	Grind Ore
+		Takes flat compacted ore #
+		Light on ticks, heavy on flat energy required
+		Produces little dirt, littler gems
+
+Tractor Beam
+	Uses flat 1 energy for 1 charge
+	At 100 charges, takes 1%+10 from passing objects,
+	takes 10% from 
+	has on/off switch
+
+Battleships
+	Rename Terraformers
+	cost -> 30m oxygen+100k*#, 3000+200*# metal
+
+
+Add planet graphics
+	show factory, on the planet
+	show solar, around the edges
+	show coilgun, on the middle and always pointed west
+	circle for building factory
+	different color for building coilgun
+	different color for building solar
+	when empty, cannon rotates with planet
+
+Add meteor graphics back
+Add ship laser animation
+Next System
+	enabled when boss planet has 0 health
+	10% difficulty increase to 1000%
+	Auto next when complete
+		Complete when all planets have 0 dirt and no ships or meteors exist
+Next Sector
+	enabled when at least 5 systems have been completed
+	resets difficulty to 0
+	powerMult is 3^sector
+	artifact gain is sector+1
+Killing bosses give void crystals
+Unused void crystals increase hangar capacity
+
+collect ships when sector is done
+	if target is home and fuel is positive,
+	don't take fuel, hide the timer
+	can't change sectors without having all ships collected
+
+Potential later upgrades:
+	Increase max # of mines per planet, make it choosable down to 1
+
+
+
+
+400 ore per tick is reasonable to obtain -- 200 mines, 200 robots, etc.
+5 dirt in 500 ticks would be 1 in 10 ticks, or .1 per tick -- that's half of what the space station sends you. That's probably low. 250 ticks would be on par with the space station.
+So 400 ore per tick, 250 ticks per 5 dirt would be my recommendation.
+
+Planets only have a small amount of dirt to send. So, you only mine enough ore for 2 construction bots, and those two bots build the solar panels to power the coil gun.
+Strictly short term function
+Yea, the whole "conquer the solar system" can use an improvement. Be nice to be able to spread your farms / etc to other planets. Real planets, that don't leak as much
+Does stopsign read this and take notes? Are our ideas going into the void?
+
+So, giving another go-round. And, I'm paying attention to details this time.
+Happyness is a straight multiplier to your production. Without increasing your water consumption.
+Improving farms increases your production, at the cost of increasing your water consumption.
+10 pop is a base production of .1, or 100 ticks (10 secs) to produce your population.
+So, eat 0.01 food, produce 0.01 output, is the base farm behavior
+... So, if I'm understanding this: 1 water turns into 1 food, which turns into 1 unit of production ($1 or 1 sci).
+Which means, early game, I can sell water for $2, or I can farm for less unless I'm pushing happyness/improving the house.
+... That is not what I expected to find out.
+Farms/ people is a bad way to go unless you are pushing happyness. Hmm.
+More profitable to sell ice after all.
+(at least early on)
+
+Yea, 8000 farms, barely 83k trees -- and this is a massively space-dirt-enhanced world -- and I can barely send 2 ships for no where near enough, maybe doing 1 point of damage to the first world, which I was lucky enough to get near me.
+I think comets/asteroids need to be tuned down; water needed (and farms needed) needs to go way, way down, minerals into dirt needs to be viable, and planets ...
+maybe the first system you are in has small planets, not much atmosphere, not even highly habited/defended, your second system has bigger and defended planets,
+and if you keep going after that, then you lose the ice market, and are relying on intra-galactic transport of ice from the various systems you've conquered ...
+and why/how are you able to make interstellar drives from what is basically leftover junk tossed together in a hurry with a small number of cryogenically frozen seed people and a rapid birth rate?
+Oh, no, no, no -- I finally realize what you are.
+You're trimps! Very high reproduction rate. Ability to cobble together these space stations / interstellar portals. High desire to fight.
+
+... I can't find it. For the ice, I was thinking that each ice upgrade would be +1 + 0.1%, or something like that -- a small constatn for the early game, and a percentage upgrade for late game
+
+To support 1,000 water on the farms, you need 1m ice, which needs 100m ice in the space station.
+That's what it takes with no ice market to even consider attacking planets
+So with a LOT of land (333k total land), which is 97% optimized with 10k dirt in orbit, 307k trees, 500 farms @ 23.5% efficiency, I am making  30.7k oxygen/sec, and 24.5k science/sec, or just over 1 battery per sec.
+The question is, how long before I can get 100m ice in the space station.
+And, how in the heck can the ice market supply such crazy levels of ice? Are they depositing comets on my doorstep? ... I'm currently at 1897 per tick, so that's a comet every 2 minutes.
+Yea, end-game requires way too much water.
+
+

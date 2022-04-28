@@ -1,0 +1,453 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <!-- to force a reload -->
+    <meta http-equiv="cache-control" content="max-age=0" />
+    <meta http-equiv="cache-control" content="no-cache" />
+    <meta http-equiv="expires" content="0" />
+    <meta http-equiv="expires" content="Tue, 01 Jan 1980 1:00:00 GMT" />
+    <meta http-equiv="pragma" content="no-cache" />
+
+    <title>梯田 - Terrafold</title>
+    <link rel="stylesheet" href="stylesheet.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+</head>
+<body id="theBody">
+
+<div id="info" style="position:fixed;z-index:1001;" class="medium">
+    <div class="showthat infoText">S<div class="showthis">
+        故事<br>
+        <div class="small">
+            Kutchian部落盯上了你星球上丰富的资源。 他们来了，你没有阻止他们。 你知道你不能，但你有一个不同的计划。
+             拥有地球最后一个储备，你已经指示你的人民建立一个行星。
+             它几乎不足以保持氛围，但你知道你可以弄清楚如何让它成长。
+             你和你的人在逃亡中逃脱了，获得资源来维持他们将是艰苦的工作。
+             您认为自己很幸运，您与水市场的联系运作良好。
+<br><br>
+            但是你的物种生存了很长时间，你不会忘记Kutchians所做的事情。<br>
+        </div>
+    </div></div>
+    <div class="showthat infoText">?<div class="showthis">
+        帮助<br><br>
+        <div class="small">
+            得到一些更多的水和建立一些农场， <br>
+            然后建造宇宙飞船并探索宇宙。<br>
+            每秒有10轮。<br>
+            浏览器标签后台化的时候，游戏也会全速运行。<br>
+            游戏会每50轮会自动保存一次。<br>
+            右键单击并拖动以移动屏幕。<br>
+            您可以在输入中使用科学数字格式，如1e12<br>
+        </div>
+    </div></div>
+    <div class="showthat infoText">O<div class="showthis">
+        选项<br><br>
+        <div class="small">
+            <div class="button" onclick="clearSave()">硬复位</div><br>
+            <div class="button" onclick="pauseGame()">暂停/继续</div><br>
+            <div class="button" onclick="game.cash+=.1">乞讨<br>(+ $0.1 每次点击，如果你卡住了)</div><br>
+            <div class="button" onclick="save()">保存</div><br>
+        </div>
+    </div></div>
+    <div id="resources" class="infoText" style="padding:0 10px;">
+        <div class="showthat2 globalResourceInfo"> <img src='img/water.png' class='largeIcon'>: <div id="totalWater"></div><div class="showthis2">来自所有地方的总水量</div></div>
+        <div class="showthat2 globalResourceInfo"> <img src='img/cash.png' class='largeIcon'>: <div id="cash"></div><div class="showthis2">现金</div></div>
+        <div class="showthat2 globalResourceInfo"> <img src='img/oxygen.png' class='largeIcon'>: <div id="oxygen"></div>
+            <div class="showthis2 small">
+                氧气<br>
+                .0001% 氧气泄漏到太空中<br>
+                <div>氧气泄漏: <div id="oxygenLeak"></div></div> 每轮。<br>
+            </div>
+        </div>
+        <div class="showthat2 globalResourceInfo"> <img src='img/science.png' class='largeIcon'>: <div id="science"></div><div class="showthis2">科学</div></div>
+        <div class="showthat2 globalResourceInfo" id="woodContainer"> <img src='img/wood.png' class='largeIcon'>: <div id="wood"></div><div class="showthis2">木头</div></div>
+        <div class="showthat2 globalResourceInfo" id="metalContainer"> <img src='img/metal.png' class='largeIcon'>: <div id="metal"></div><div class="showthis2">金属</div></div>
+    </div>
+</div>
+
+
+<div id="mainContainer" style="position:absolute;width:2500px;height:900px;overflow:auto;" class="small" oncontextmenu="return false;">
+
+    <div id="spaceTransition"></div>
+
+    <div id="spaceContainer">
+    </div>
+
+    <div id="cometsContainer" style="position:absolute;">
+    </div>
+
+    <canvas id="spaceCanvas" width="1000" height="900" style="position:absolute;left:1600px;"></canvas>
+
+    <div id="iceContainer" class="container showthat" style="left:0;top:35px;width:130px;">
+        <div class="title">冰</div>
+        <div class="waterIcon showthat2"><img src='img/water.png' class='superLargeIcon'>
+            <div class="showthis2">
+                <div>融化: <div id="iceTransferred"></div></div> <img src='img/water.png' class='smallIcon'><br>
+            </div>
+        </div>
+        <div>冰: <div id="ice"></div></div><br>
+        <input id="buyIceAmount" type="number" value="1000"><br>
+        <div class="button" onclick="game.buyIce()">花费 $1 购买冰</div><br>
+        <div>可购买的冰: <div id="buyableIce"></div></div><br>
+        <div class="showthis">
+            冰以每轮0.1％的速度融化并变为 <img src='img/water.png' class='smallIcon'>.<br>
+            <label for="buyIceAmount">使用输入设置您想要购买的数量。</label><br>
+            您可以一次购买到最高，并且它会返回 <div id="iceBuyerAmount"></div> 每轮。
+        </div>
+    </div>
+
+    <div id="indoorWaterContainer" class="container showthat" style="left:0;top:210px;">
+        <div class="title">存储</div>
+        <div class="waterIcon showthat2"><img src='img/water.png' class='superLargeIcon'>
+            <div class="showthis2">
+                <div>接收: <div id="indoorWaterReceived"></div> <img src='img/water.png' class='smallIcon'></div><br>
+                <div>溢出: <div id="excessWater"></div></div> <img src='img/water.png' class='smallIcon'><br>
+            </div>
+        </div>
+        <div><img src='img/water.png' class='smallIcon'>: <div id="indoorWater"></div></div><br>
+        <div> 出售: <div id="indoorWaterSelling"></div></div><br>
+        <div> 利润: <div id="indoorWaterProfits"></div></div><br>
+        <div> 最大: <div id="indoorWaterMax"></div></div><br>
+        <div class="showthis">
+            当 <img src='img/water.png' class='smallIcon'> 达到最大限度，多余的水会流入湖中。<br>
+            每轮最多卖出1％。 每1个可以卖$2。<br>
+        </div>
+    </div>
+
+    <div id="outdoorWaterContainer" class="container showthat" style="left:180px;top:265px;">
+        <div class="title">湖泊</div>
+        <div class="waterIcon showthat2"><img src='img/water.png' class='superLargeIcon'>
+            <div class="showthis2">
+                <div>从仓库接收: <div id="lakeWaterFromStorage"></div> <img src='img/water.png' class='smallIcon'></div><br>
+                <div>从森林接收: <div id="lakeWaterFromForest"></div> <img src='img/water.png' class='smallIcon'></div><br>
+                <div>从农场接收: <div id="lakeWaterFromFarm"></div> <img src='img/water.png' class='smallIcon'></div><br>
+                <div>蒸发: <div id="waterTransferred"></div></div> <img src='img/water.png' class='smallIcon'><br>
+            </div>
+        </div>
+        <div><img src='img/water.png' class='smallIcon'>: <div id="outdoorWater"></div></div><br>
+        <div class="showthis">
+            湖泊 <img src='img/water.png' class='smallIcon'> 每轮蒸发0.1％的水进入云层。
+        </div>
+    </div>
+
+    <div id="cloudsContainer" class="container showthat" style="left:300px;top:20px;">
+        <div class="title">云</div>
+        <div class="waterIcon showthat2"><img src='img/water.png' class='superLargeIcon'>
+            <div class="showthis2">
+                <div>接收: <div id="cloudsReceived"></div> <img src='img/water.png' class='smallIcon'></div><br>
+                <div>下雨: <div id="rain"></div></div> <img src='img/water.png' class='smallIcon'><br>
+            </div>
+        </div>
+        <div><img src='img/water.png' class='smallIcon'>: <div id="clouds"></div></div><br>
+        <div class='progress-bar'>
+            <div>下次风暴:<br><div id="stormTimer"></div></div><br>
+            <canvas id='nextStormProgress' class='progress-active' height='80px' width='80px'></canvas>
+        </div>
+        <div class='progress-bar'>
+            <div>持续时间:<br><div id="stormDuration"></div></div><br>
+            <canvas id='stormDurationProgress' class='progress-active' height='80px' width='80px'></canvas>
+        </div><br>
+        <div>强度: <div id="stormRate"></div></div><br>
+        <div class="verticalProgress" style="left:94px;top:88px;">
+            <div class="verticalProgressInner" id="intensityPB"></div>
+        </div>
+        <div id="lightningContainer">
+            <div>闪电几率: <div id="lightningChance"></div></div>%<br>
+        </div>
+        <div class="showthis">
+            只有暴风雨时，雨才会降临在陆地上。<br>
+            降雨比率 (水 / 500) * 强度。<br>
+            <div id="lightningTooltip">
+                每轮雷击的可能性很大。<br>
+                只有一个完整的风暴来袭。<br>
+                冲击强度为sqrt（水）。<br>
+                <div>雷电强度: <div id="lightningStrength"></div></div><br>
+            </div>
+        </div>
+    </div>
+
+    <div id="landContainer" class="container showthat" style="left:470px;top:245px;">
+        <div class="title">陆地</div>
+        <div class="waterIcon showthat2"><img src='img/water.png' class='superLargeIcon'>
+            <div class="showthis2">
+                <div>接收: <div id="landReceived"></div> <img src='img/water.png' class='smallIcon'></div><br>
+                <div>干燥陆地成为土壤: <div id="landConverted"></div></div> <img src='img/water.png' class='smallIcon'><br>
+                <div>溢出到森林: <div id="landWaterToForest"></div> <img src='img/water.png' class='smallIcon'></div><br>
+                <div>溢出到农场: <div id="landWaterToFarm"></div> <img src='img/water.png' class='smallIcon'></div><br>
+            </div>
+        </div>
+        <div><img src='img/water.png' class='smallIcon'>: <div id="landWater"></div></div><br>
+        <div>总陆地面积: <div id="optimizedLand"></div></div><br>
+        <div>土壤: <div id="soil"></div></div><br>
+        <div class="showthis">
+            <div>基本陆地: <div id="baseLand"></div></div><br>
+            <div>干燥陆地: <div id="land"></div></div><br>
+            干燥陆地 + 水 = 土壤, 比率为 (水 / 1000)<br>
+            0.1% <img src='img/water.png' class='smallIcon'> 提供给森林, 其它 0.1% 提供给农场。<br>
+        </div>
+    </div>
+
+    <div id="treesContainer" class="container showthat" style="left:760px;top:40px;">
+        <div class="title">森林</div>
+        <div class="waterIcon showthat2"><img src='img/water.png' class='superLargeIcon'>
+            <div class="showthis2">
+                <div>接收: <div id="forestReceived"></div> <img src='img/water.png' class='smallIcon'></div><br>
+                <div><img src='img/water.png' class='smallIcon'> 供给给蕨类植物: <div id="fernWater"></div> <img src='img/water.png' class='smallIcon'></div><br>
+                <div><img src='img/water.png' class='smallIcon'> 供给给小树: <div id="smallTreesWater"></div> <img src='img/water.png' class='smallIcon'></div><br>
+                <div><img src='img/water.png' class='smallIcon'> 供给给大树: <div id="treesWater"></div> <img src='img/water.png' class='smallIcon'></div><br>
+                <div>流进湖泊: <div id="forestWaterToLake"></div> <img src='img/water.png' class='smallIcon'></div><br>
+            </div>
+        </div>
+        <div><img src='img/water.png' class='smallIcon'>: <div id="forestWater"></div></div><br>
+
+        <div class="forestIcon showthat2">
+            <img src='img/fern.png' class='superLargeIcon'><br>
+            <div><div id="ferns"></div></div>
+            <div class="showthis2">
+                蕨类植物<br>
+                <div>蕨类植物三角洲: <div id="fernsDelta"></div></div><br>
+                0.1% of 的蕨类植物通过使用水变成大树<br>
+                一棵蕨类植物制造 .001 氧气/轮<br>
+            </div>
+        </div>
+        <i class="fa fa-arrow-right"></i>
+        <div class="forestIcon showthat2">
+            <img src='img/smalltree.svg' class='superLargeIcon'><br>
+            <div><div id="smallTrees"></div></div>
+            <div class="showthis2">
+                小树<br>
+                <div>小树三角洲: <div id="smallTreesDelta"></div></div><br>
+                0.1% 的小树通过使用水变成大树。<br>
+                一棵小树制造 0.003 氧气/轮<br>
+            </div>
+        </div>
+        <i class="fa fa-arrow-right"></i>
+        <div class="forestIcon showthat2">
+            <img src='img/tree.png' class='superLargeIcon'><br>
+            <div><div id="trees"></div></div>
+            <div class="showthis2">
+                大树<br>
+                <div>大树三角洲: <div id="treesDelta"></div></div><br>
+                1棵树制造 0.01 氧气/轮<br>
+            </div>
+        </div><br>
+        <div>总计植树: <div id="totalPlants"></div></div><br>
+        <div>已产生氧气: <div id="oxygenGain"></div></div><br>
+
+        <div class="showthis" style="width:300px;">
+            总植物平衡等于土壤量。<br>
+            每株植物都需要1个水才能生长。<br>
+            如果平衡较少，较小的植物首先死亡。<br>
+            总植物越接近平衡，蕨类植物生长越慢。<br>
+            每轮都有 0.1% 的水返回到湖里。<br>
+        </div>
+    </div>
+
+    <div id="foodContainer" class="container showthat" style="left:680px;top:210px;">
+        <div class="title">农场</div>
+        <div class="waterIcon showthat2"><img src='img/water.png' class='superLargeIcon'>
+            <div class="showthis2">
+                <div>食物消耗: <div id="farmFoodEaten"></div></div><br>
+                <div>接收: <div id="farmReceived"></div> <img src='img/water.png' class='smallIcon'></div><br>
+                <div>食物消耗的水: <div id="foodCreated"></div> <img src='img/water.png' class='smallIcon'></div><br>
+                <div>溢出到湖泊的水: <div id="farmWaterToLake"></div> <img src='img/water.png' class='smallIcon'></div><br>
+            </div>
+        </div>
+        <div><img src='img/water.png' class='smallIcon'>: <div id="farmsWater"></div></div><br>
+        <input id="buyFarmAmount" type="number" step="1" value="1"><br>
+        <div class="button" onclick="game.buyFarms()">购买农场花费 50 土壤</div><br>
+        <div>农场: <div id="farms"></div></div><br>
+        <div>食物: <div id="food"></div></div><br>
+        <div class="showthis">
+            <label for="buyFarmAmount">使用输入设置您想要购买的数量。</label><br>
+            警告：使用土壤会减少树木。<br>
+            1个农场产生 0.01 食物/轮 , 用水。<br>
+            每轮都有 0.1% 的水返回到湖里。<br>
+            <div>农场效率: <div id="efficiency"></div>%</div><br>
+        </div>
+    </div>
+
+    <div id="populationContainer" class="container showthat" style="left:920px;top:370px;">
+        <div class="title">城市</div>
+        <div class="waterIcon showthat2"><img src='img/happy.jpg' class='superLargeIcon'>
+            <div class="showthis2">
+                <div>食物消耗: <div id="foodEaten"></div></div><br>
+                <div>人口增长: <div id="populationGrowth"></div></div><br>
+                <div>死于饥饿的人口: <div id="starving"></div></div><br>
+                <div>来自房子的基础快乐值: <div id="happinessFromHouse"></div></div><br>
+                <div>来自树木的快乐值: <div id="happinessFromTrees"></div></div><br>
+                <div>来自氧气的快乐值: <div id="happinessFromOxygen"></div></div><br>
+            </div>
+        </div>
+        <div>人口: <div id="population"></div></div><br>
+        <div>快乐值: <div id="happiness"></div></div><br>
+        <div id="sliderContainer" style="width:150px;">
+            <input type="range" min="0" max="100" value="0" class="slider" id="scienceSlider">
+        </div><br>
+        <div id="scienceRatio"></div><br>
+        <div>生产科学: <div id="scienceDelta"></div></div><br>
+        <div>生产金钱: <div id="cashDelta"></div></div><br>
+        <div class="showthis">
+            每个人吃掉 0.01 食物 / 轮。<br>
+            如果食物为0，人们会死得更快。<br>
+            如果他们更快乐，人们会更加努力。<br>
+            安排人们去创造科学还是现金。<br>
+        </div>
+    </div>
+
+    <div id="computerContainer" class="container" style="left:0;top:400px;">
+        <div class="title">计算机</div>
+        <div id="unlockComputer" class="button" onclick="game.computer.unlockComputer()">建造计算机 (1000 科学)</div>
+        <div id="unlockedComputer" style="display:none;">
+            <div>线程: <div id="freeThreads"></div>/<div id="threads"></div></div> 速度: <div id="speed"></div><br>
+            <div id="buyThread" class="button" onclick="game.computer.buyThread()">研究新线程 (+1 线程) 消耗 <div id="threadCost"></div> 科学</div><br>
+            <div id="buySpeed" class="button" onclick="game.computer.buySpeed()">购买处理器 (+1 速度) 消耗 <div id="speedCost"></div> 金钱</div><br>
+            <div id="computerRows" style="text-align:left;">
+            </div>
+        </div>
+    </div>
+
+    <div id="robotsContainer" class="container" style="left:380px;top:515px;">
+        <div class="title">机器人</div>
+        <div id="unlockRobots" class="button" onclick="game.robots.unlockRobots()">特别交易! 购买第一个机器人花费 $3000</div><br>
+        <div id="failRobots" class="button" onclick="game.robots.failedRobots()">购买机器人花费 $1m 金钱</div>
+        <div id="unlockedRobots">
+            <div>空闲: <div id="robotsFree"></div>, 总计: <div id="robots"></div>, 最大: <div id="robotMax"></div></div><br>
+            <div>矿石: <div id="ore"></div></div><br>
+            <div id="robotRows" style="text-align:left;">
+            </div>
+        </div>
+    </div>
+
+    <div id="energyContainer" class="container showthat" style="left:380px;top:365px;">
+        <div class="title">发电厂</div>
+        <div id="unlockEnergy" class="button" onclick="game.energy.unlockEnergy()">建造发电厂花费 500 金属</div>
+        <div id="unlockedEnergy">
+            <div>能源: <div id="energy"></div></div><br>
+            <div>电池: <div id="battery"></div></div><br>
+            <input id="buyBattery" type="number" value="1"><br>
+            <div class="button" onclick="game.buyBattery()">+1 电池 <br><div id="batteryCost">30k 氧气, 20k 科学</div></div><br>
+        </div><br>
+        <div class="showthis">
+            每轮损失2％的能量当超过电池容量时<br>
+            <div>排液: <div id="drain"></div></div><br>
+        </div>
+    </div>
+
+    <div id="spaceStationContainer" class="container showthat" style="left:1100px;top:30px;">
+        <div class="title">空间站</div>
+        <div id="unlockSpaceStation" class="button" onclick="game.spaceStation.unlockSpaceStation()">建造空间站花费 2000 金属, 20k 木头</div>
+        <div id="unlockedSpaceStation">
+            <div>你拥有 <div id="orbitingResources"></div></div> 在轨道上。<br>
+            <div>发送 <div id="orbitSending"></div></div> 到这个星球。<br>
+        </div>
+
+        <div class="showthis">
+            向地球发送0.01％的轨道资源。<br>
+            泥土被添加到基础陆地。<br>
+        </div>
+    </div>
+
+    <div id="tractorBeamContainer" class="container showthat" style="left:1100px;top:140px;">
+        <div class="title">牵引光束</div>
+        <div id="unlockTractorBeam" class="button" onclick="game.tractorBeam.unlockTractorBeam()">建造牵引光束花费 5m 氧气, 500k 科学</div>
+        <div id="unlockedTractorBeam">
+            能源: <div id="tractorBeamEnergy"></div> 在 <div id="tractorBeamEnergyNeeded"></div>之外<br><br>
+
+            <div id="allPassing"></div>
+        </div>
+
+        <div class="showthis">
+            每轮使用发电厂1％的能量进行充电<br>
+             充电时，将1％+ 10的通过碎片拉入轨道<br>
+             每轮有2/3次机会找到新的彗星。<br>
+             每轮有1/3的机会找到新的小行星。<br>
+            带 <div id="takeAmount"></div> 进入轨道最后一次充电
+        </div>
+    </div>
+
+    <div id="spaceDockContainer" class="container showthat" style="left:1420px;top:30px;">
+        <div class="title">太空码头</div>
+        <input id="buyBattleshipAmount" type="number" value="1"><br>
+        <div class="button" onclick="game.buyBattleship()">建造战列舰消耗 <br><div id="battleshipCost">30m 氧气, 15m 科学</div></div><br>
+        战列舰: <div id="battleships"></div><br>
+        能源: <div id="spaceportEnergy"></div><br>
+        电池: <div id="spaceBattery"></div>
+
+        <div class="showthis">
+            <label for="buyBattleshipAmount">使用输入设置您想要购买的数量。</label><br>
+        </div>
+    </div>
+
+    <div id="hangarContainer" class="container showthat" style="left:1460px;top:260px;">
+        <div class="title">机库 1</div>
+        发送 <div id="hangar0Sending"></div>
+        <div class="showthis">
+            需要你当前的粮食的5％。 船只吃的时间越长，持续时间越长<br>
+             当一艘船没有食物时，它会回到基地<br>
+             调整船舶产卵的地方 - 它们将瞄准最近的行星<br>
+             在继续前进之前，船会破坏大气层，破坏健康并建造建筑物<br>
+             建筑物直接将泥土添加到您的空间站<br>
+             警告 - 飞行中的战舰或行星状态无法保存。 您现在可以刷新一组新的行星。 正在努力......
+        </div>
+    </div>
+
+    <div id="shipSpawnSlidersContainer" style="left:1685px;top:220px;position:absolute;">
+        <div class="sliderWrapper">
+            <input type="range" min="0" max="100" step="1" value="0" class="shipSpawnSlider" id="shipSpawnSlider1">
+        </div><br>
+    </div>
+
+
+</div>
+
+
+</body>
+<script src="zh.js"></script>
+<script src="helpers.js"></script>
+<script src="interval.js"></script>
+<script src="view.js"></script>
+<script src="driver.js"></script>
+<script src="game.js"></script>
+<script src="classes/Clouds.js"></script>
+<script src="classes/Computer.js"></script>
+<script src="classes/Energy.js"></script>
+<script src="classes/Farms.js"></script>
+<script src="classes/Hangar.js"></script>
+<script src="classes/Ice.js"></script>
+<script src="classes/Land.js"></script>
+<script src="classes/Planet.js"></script>
+<script src="classes/City.js"></script>
+<script src="classes/Robots.js"></script>
+<script src="classes/Ship.js"></script>
+<script src="classes/Space.js"></script>
+<script src="classes/SpaceDock.js"></script>
+<script src="classes/SpaceStation.js"></script>
+<script src="classes/TractorBeam.js"></script>
+<script src="classes/Trees.js"></script>
+<script src="classes/Water.js"></script>
+<script src="UIClasses/spaceView.js"></script>
+<script src="UIClasses/ProgressBar.js"></script>
+<script src="hotkeys.js"></script>
+<script src="saving.js"></script>
+<!--客服 开始-->
+<script src="https://cdn.jsdelivr.net/gh/g8hh/g8hh.github.io/static/js/jquery.min.js"></script>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/g8hh/g8hh.github.io/static/css/kf.css" type="text/css" media="screen" charset="utf-8">
+<script src="https://cdn.jsdelivr.net/gh/g8hh/g8hh.github.io/static/js/kf.js"></script>
+<!-- 客服 结束 -->
+<!--站长统计--> 
+<div style="display: none">
+    <script>
+var _hmt = _hmt || [];
+(function() {
+  var hm = document.createElement("script");
+  hm.src = "https://hm.baidu.com/hm.js?028b1b5f659ed138230f4cafd7ad0dfc";
+  var s = document.getElementsByTagName("script")[0]; 
+  s.parentNode.insertBefore(hm, s);
+})();
+</script>
+    </div>
+<style>
+    div.main-im div{display: block;}
+    </style>
+</html>
